@@ -28,6 +28,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTHENTICATION_BACKENDS = (
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '172625725631-m31ieoc1e84a7b5ijaupnjf7cbp5f5iu.apps.googleusercontent.com'  # Replace with your actual client ID
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'  # Replace with your actual client secret
+
+SITE_ID = 1  # Add this setting to enable Allauth
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -40,6 +51,15 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': False,
 }
 
+# Where the user will be redirected after a successful login
+LOGIN_REDIRECT_URL = '/'  # Change this to where you want the user to go
+
+# Where the user will be redirected after logout
+LOGOUT_REDIRECT_URL = '/'  # This can be any page
+
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,7 +71,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'love_and_lightapp',  
+    'love_and_lightapp', 
+    'django.contrib.sites',
+    'allauth',
+    'social_django',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+     
 ]
 
 MIDDLEWARE = [
@@ -62,6 +89,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'love_and_light.urls'
