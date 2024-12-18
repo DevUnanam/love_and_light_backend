@@ -20,8 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xyn6&dsf9^c0i1uvga1jhj0tk$9v)vx0hv%$f%xb4q^u7*wh^0'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -33,8 +32,20 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '172625725631-m31ieoc1e84a7b5ijaupnjf7cbp5f5iu.apps.googleusercontent.com'  # Replace with your actual client ID
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'  # Replace with your actual client secret
+import environ
+
+# Initialize environment variables
+env = environ.Env(
+    DEBUG=(bool, False)  # Set default values and casting
+)
+environ.Env.read_env()  # Reads the .env file
+
+# Use environment variables in settings
+DEBUG = env('DEBUG')  # Will default to False if not in .env
+SECRET_KEY = env('SECRET_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+
 
 SITE_ID = 1  # Add this setting to enable Allauth
 
