@@ -53,7 +53,11 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
+    'ROTATE_REFRESH_TOKENS': True,  # Ensures refresh tokens are rotated
+    'BLACKLIST_AFTER_ROTATION': True,  # Blacklists old refresh tokens after rotation
+    'ALGORITHM': 'HS256',  # Default algorithm for signing tokens
+    'AUTH_HEADER_TYPES': ('Bearer',),  # Specifies token type in the Authorization header
+    'TOKEN_BLACKLIST_ENABLED': True,  # Ensure this is enabled for blacklisting to work
 }
 
 # Where the user will be redirected after a successful login
@@ -76,6 +80,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'love_and_lightapp', 
     'django.contrib.sites',
     'allauth',
