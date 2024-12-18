@@ -32,19 +32,13 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-import environ
-
-# Initialize environment variables
-env = environ.Env(
-    DEBUG=(bool, False)  # Set default values and casting
-)
-environ.Env.read_env()  # Reads the .env file
+import os
 
 # Use environment variables in settings
-DEBUG = env('DEBUG')  # Will default to False if not in .env
-SECRET_KEY = env('SECRET_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+DEBUG = os.getenv('DEBUG') == 'True'
+SECRET_KEY = os.getenv('SECRET_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
 
 SITE_ID = 1  # Add this setting to enable Allauth
