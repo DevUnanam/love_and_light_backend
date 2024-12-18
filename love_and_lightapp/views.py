@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView, RetrieveAPIView 
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework_simplejwt.tokens import OutstandingToken, BlacklistedToken
@@ -15,6 +16,17 @@ class RegisterView(CreateAPIView):
     
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Override the post method to return both access and refresh tokens
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({
+            'access': serializer.validated_data['access'],
+            'refresh': serializer.validated_data['refresh']
+        })
 
 # Admin Registration Endpoint
 @api_view(['POST'])
@@ -79,3 +91,39 @@ class UserDetailView(RetrieveAPIView):
             return CustomUser.objects.all()  # Admin can access all users
         return CustomUser.objects.filter(id=user.id)  # Regular user can access only their own data
 
+
+class UpdateUserView(UpdateAPIView):
+    """
+    Updates user information (Admin or self).
+    """
+    queryset = CustomUser.objects.all()  # Queryset to get users
+    serializer_class = UserSerializer  # Serializer to format the data
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return CustomUser.objects.all()  # Admin can access and update any user
+        return CustomUser.objects.filter(id=user.id)  # Regular user can access and update only their own data
+
+
+class DeleteUserView(APIView):
+    """
+    Deletes a user (Admin or the user itself).
+    """
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+
+    def delete(self, request, pk, format=None):
+        try:
+            # Retrieve the user by primary key (pk)
+            user = CustomUser.objects.get(pk=pk)
+
+            # Check if the requesting user is an Admin or if the user is deleting their own account
+            if request.user.is_staff or request.user == user:
+                user.delete()
+                return Response({"message": "User deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({"error": "You do not have permission to delete this user."}, status=status.HTTP_403_FORBIDDEN)
+
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
