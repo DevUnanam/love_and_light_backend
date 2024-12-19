@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, Property
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 # Existing UserSerializer for self-registration
@@ -74,3 +74,14 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         # Proceed with JWT validation if login is successful
         return super().validate(attrs)
+
+
+class PropertySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Property
+        fields = ['id', 'owner', 'address', 'property_type', 'price', 'description']
+    
+    def create(self, validated_data):
+        # Ensures that only authenticated users can add properties
+        validated_data['owner'] = self.context['request'].user
+        return super().create(validated_data)

@@ -1,5 +1,6 @@
 # models.py
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.conf import settings
+from django.contrib.auth.models import User, AbstractUser, BaseUserManager
 from django.db import models
 
 # User Roles
@@ -39,3 +40,20 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email  # Return email as the string representation
+
+
+class Property(models.Model):
+    PROPERTY_TYPES = [
+        ('residential', 'Residential'),
+        ('commercial', 'Commercial'),
+        ('land', 'Land'),
+    ]
+    
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='properties')
+    address = models.CharField(max_length=255)
+    property_type = models.CharField(max_length=50, choices=PROPERTY_TYPES)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField()
+
+    def __str__(self):
+        return f"{self.property_type} - {self.address}"

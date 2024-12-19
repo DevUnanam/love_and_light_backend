@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView, ListAPIView, DestroyAPIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework_simplejwt.tokens import OutstandingToken, BlacklistedToken
-from .models import CustomUser
-from .serializers import UserSerializer, CustomTokenObtainPairSerializer, AdminRegisterSerializer
+from .models import CustomUser, Property
+from .serializers import UserSerializer, CustomTokenObtainPairSerializer, AdminRegisterSerializer, PropertySerializer
 
 class RegisterView(CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -127,3 +127,37 @@ class DeleteUserView(APIView):
 
         except CustomUser.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+
+# Add a new property
+class PropertyCreateView(CreateAPIView):
+    queryset = Property.objects.all()
+    serializer_class = PropertySerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)  # Assign property to the authenticated user
+
+# List all properties
+class PropertyListView(ListAPIView):
+    queryset = Property.objects.all()
+    serializer_class = PropertySerializer
+    permission_classes = [IsAuthenticated]
+
+# Retrieve details of a specific property
+class PropertyDetailView(RetrieveAPIView):
+    queryset = Property.objects.all()
+    serializer_class = PropertySerializer
+    permission_classes = [IsAuthenticated]
+
+# Update property details
+class PropertyUpdateView(UpdateAPIView):
+    queryset = Property.objects.all()
+    serializer_class = PropertySerializer
+    permission_classes = [IsAuthenticated]
+
+# Delete a property
+class PropertyDeleteView(DestroyAPIView):
+    queryset = Property.objects.all()
+    serializer_class = PropertySerializer
+    permission_classes = [IsAuthenticated]
