@@ -9,6 +9,10 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import OutstandingToken, BlacklistedToken
 from .models import CustomUser, Property
 from .serializers import UserSerializer, CustomTokenObtainPairSerializer, AdminRegisterSerializer, PropertySerializer
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("Welcome to the Love and Light API")
 
 class RegisterView(CreateAPIView):
     queryset = CustomUser.objects.all()
